@@ -1,0 +1,19 @@
+📈 ResNet34 -
+   Train Loss: 0.0122
+   Train Accuracy: 99.78%
+   Test Loss:  0.6385
+   Test Accuracy:  86.83%
+   Best Test Accuracy:   87.15%
+
+2. DenseNet121
+
+📈 DenseNet121 -
+   Train Loss: 0.0024
+   Train Accuracy: 99.98%
+   Test Loss:  0.4134
+   Test Accuracy:  90.33%
+   Best Test Accuracy:   90.65%
+
+
+ResNet34 - Test Accuracy: 87.15%
+DenseNet121 - Test Accuracy: 90.65%
