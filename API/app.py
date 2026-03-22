@@ -1,35 +1,90 @@
+import time
+import torch
+import torch.nn.functional as F
 from fastapi import FastAPI, UploadFile, File
 from PIL import Image
-import torch
+from fastapi.middleware.cors import CORSMiddleware
 
 from model import load_model
 from utils import preprocess_image
+from gradcam import generate_gradcam
+from feature_maps import feature_maps_to_images
 
 app = FastAPI()
 
-# Load classes
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 classes = torch.load("models/classes.pth")
 
-# Load model
-model = load_model("models/densenet121_best.pth", num_classes=len(classes))
+model = load_model("models/densenet121_best.pth", len(classes), device)
 
+total_params = sum(p.numel() for p in model.parameters())
 
 @app.get("/")
 def home():
     return {"message": "Plant Classification API 🌿"}
 
-
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    image = Image.open(file.file).convert("RGB")
-    input_tensor = preprocess_image(image)
+    try:
+        start_time = time.time()
 
-    with torch.no_grad():
-        outputs = model(input_tensor)
-        _, predicted = torch.max(outputs, 1)
+        image = Image.open(file.file).convert("RGB")
+        input_tensor = preprocess_image(image)
 
-    predicted_class = classes[predicted.item()]
+        with torch.no_grad():
+            outputs = model(input_tensor.to(device))
+            probs = F.softmax(outputs, dim=1)
 
-    return {
-        "prediction": predicted_class
-    }
+        k = min(3, probs.shape[1])
+        top_probs, top_idxs = torch.topk(probs, k)
+
+        predictions = [
+            {
+                "species": classes[top_idxs[0][i].item()],
+                "confidence": round(top_probs[0][i].item(), 4)
+            }
+            for i in range(k)
+        ]
+
+        # Feature maps and Grad-CAM
+        grad_results = generate_gradcam(model, input_tensor, device)
+        heatmap = grad_results["heatmap"]
+        feature_maps = feature_maps_to_images(grad_results["activations"], max_maps=8)
+
+        inference_time = int((time.time() - start_time) * 1000)
+
+        return {
+            "success": True,
+            "data": {
+                "predictions": predictions,
+                "featureMaps": feature_maps,
+                "attentionHeatmap": heatmap,
+                "processingStats": {
+                    "modelName": "DenseNet121",
+                    "inferenceTime": f"{inference_time}ms",
+                    "confidence": round(top_probs[0][0].item(), 2),
+                    "layers": 121,
+                    "parameters": f"{round(total_params / 1e6, 2)}M"
+                }
+            }
+        }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+#     Path
+# ----
+# C:\Users\Rana Kalpraj\OneDrive\Desktop\IBM_AI\new\AISS
+
+
