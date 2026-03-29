@@ -16,6 +16,16 @@ A plant species recognition and insights platform combining fast API backend, de
 
 3. Data processing & model training are in `Data_operations` and `src/indoherb`. -->
 
+## 🖼️ Results
+
+<table>
+  <tr>
+    <td><img width="1920" height="2127" alt="screencapture-localhost-5173-2026-03-29-20_52_57" src="https://github.com/user-attachments/assets/137fe438-9074-4a22-bd92-049808de0091" /></td>
+    <td><img width="1920" height="2127" alt="screencapture-localhost-5173-2026-03-29-20_53_33" src="https://github.com/user-attachments/assets/eac4fe22-03e4-4ad8-94c6-7fe8a5dbbffd" /></td>
+  </tr>
+</table>
+
+
 ## 📁 Project Structure
 
 - `API/` - FastAPI routes, model inference, Grad-CAM utilities.
@@ -23,14 +33,6 @@ A plant species recognition and insights platform combining fast API backend, de
 - `frontend/` - web UI (Vite/React).
 - `Results/` - outputs, demo screenshots.
 
-## 🖼️ Results (side-by-side)
-
-<table>
-  <tr>
-    <td><img src="Results/Web1.png" alt="Web1" width="450" /></td>
-    <td><img src="Results/Web2.png" alt="Web2" width="450" /></td>
-  </tr>
-</table>
 
 ## 🧩 Usage
 
