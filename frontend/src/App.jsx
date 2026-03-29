@@ -2,6 +2,21 @@ import { useState, useRef } from "react";
 import axios from "axios";
 import { BarChart } from 'klearcharts';
 
+const sampleModules = import.meta.glob("../Sample_data/**/*.{jpg,jpeg,png,webp}", { eager: true });
+const sampleImages = Object.entries(sampleModules).map(([path, mod]) => {
+  const parts = path.split('/');
+  const folderName = parts[parts.length - 2];
+  const fileName = parts[parts.length - 1];
+  // Extract English name from folder (before parenthesis)
+  const englishName = folderName.split(' (')[0];
+  return {
+    name: englishName,
+    url: mod.default,
+    fileName,
+    folder: folderName,
+  };
+});
+
 export default function App() {
   const [image, setImage] = useState(null);
   const [imageFile, setImageFile] = useState(null);
@@ -19,6 +34,20 @@ export default function App() {
     setImageFile(file);
     setResult(null);
     setError(null);
+  };
+
+  const handleSampleSelect = async (sample) => {
+    try {
+      const response = await fetch(sample.url);
+      const blob = await response.blob();
+      const selectedFile = new File([blob], sample.fileName, { type: blob.type || 'image/jpeg' });
+      setImage(sample.url);
+      setImageFile(selectedFile);
+      setResult(null);
+      setError(null);
+    } catch (err) {
+      setError('Unable to load sample image.');
+    }
   };
 
   const handleDrop = (e) => {
@@ -131,6 +160,24 @@ export default function App() {
                 ) : "Identify Plant"}
               </button>
             )}
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+            <h2 className="font-semibold text-gray-800 mb-3">Or try with sample plants</h2>
+            <p className="text-xs text-gray-700">Click any plant to see predictions and visualizations</p>
+            <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {sampleImages.slice(0, 12).map((sample, idx) => (
+                <button
+                  key={`${sample.name}-${idx}`}
+                  onClick={() => handleSampleSelect(sample)}
+                  className="border border-gray-200 rounded-xl overflow-hidden text-left hover:shadow-md transition hover:border-teal-300"
+                  type="button"
+                >
+                  <img src={sample.url} alt={sample.name} className="w-full h-20 object-cover" />
+                  <div className="p-2 text-xs font-medium text-gray-700 truncate">{sample.name}</div>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Top prediction card */}

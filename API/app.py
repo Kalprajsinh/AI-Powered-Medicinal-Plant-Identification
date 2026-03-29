@@ -83,8 +83,4 @@ async def predict(file: UploadFile = File(...)):
             "success": False,
             "error": str(e)
         }
-#     Path
-# ----
-# C:\Users\Rana Kalpraj\OneDrive\Desktop\IBM_AI\new\AISS
-
 
