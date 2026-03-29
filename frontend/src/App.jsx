@@ -64,7 +64,7 @@ export default function App() {
     try {
       const formData = new FormData();
       formData.append("file", imageFile);
-      const res = await axios.post("http://localhost:8000/predict", formData, {
+      const res = await axios.post("https://ai-powered-medicinal-plant-identification.onrender.com/predict", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       if (res.data.success) setResult(res.data.data);
@@ -143,22 +143,29 @@ export default function App() {
               onChange={(e) => handleFile(e.target.files[0])}
             />
 
-            {image && (
-              <button
-                onClick={handlePredict}
-                disabled={loading}
-                className="mt-4 w-full py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-semibold text-sm transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <>
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-                    </svg>
-                    Analyzing...
-                  </>
-                ) : "Identify Plant"}
-              </button>
+            {image && ( 
+              <>
+                {loading && (
+                  <div className="mb-3 rounded-xl border border-orange-300 bg-orange-50 p-3 text-sm text-orange-700">
+                    Backend hosted on free instance which can delay requests by 50 seconds or more, please wait while processing image.
+                  </div>
+                )}
+                <button
+                  onClick={handlePredict}
+                  disabled={loading}
+                  className="mt-4 w-full py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-semibold text-sm transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                      </svg>
+                      Analyzing...
+                    </>
+                  ) : "Identify Plant"}
+                </button>
+              </>
             )}
           </div>
 

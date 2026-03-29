@@ -4,6 +4,8 @@ import torch.nn.functional as F
 from fastapi import FastAPI, UploadFile, File
 from PIL import Image
 from fastapi.middleware.cors import CORSMiddleware
+import os
+import uvicorn
 
 from model import load_model
 from utils import preprocess_image
@@ -14,7 +16,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["https://medicinal-plant-identification-brown.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -84,3 +86,6 @@ async def predict(file: UploadFile = File(...)):
             "error": str(e)
         }
 
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("app:app", host="0.0.0.0", port=port)

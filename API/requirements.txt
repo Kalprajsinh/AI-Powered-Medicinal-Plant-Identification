@@ -10,4 +10,5 @@ uvicorn
 torch
 torchvision
 pillow
+opencv-python
 
